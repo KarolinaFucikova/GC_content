@@ -30,9 +30,11 @@ fancyplot<-ggplot(gc_clean, aes(x=max_temp, y=SSU_GC, color=habitat, shape=habit
   geom_point(size=5) + geom_smooth(method=lm, aes(fill=habitat))
 fancyplot 
 # exploring some other options with color coding
-#fancyplot<-ggplot(gc_clean, aes(x=max_temp, y=SSU_GC, color=habitat, shape=habitat)) + 
-#  geom_point(size=5) + geom_smooth(method=lm, se=FALSE) +
-#  scale_color_manual(values=c('#56B4E9','#999999','#E69F00'))
+fancyplot<-ggplot(gc_clean, aes(x=max_temp, y=SSU_GC, color=habitat, shape=habitat)) + 
+  geom_point(size=5) + geom_smooth(method=lm, se=FALSE) +
+  scale_color_manual(values=c('#56B4E9','#999999','#E69F00'))
+fancyplot
+# the above looks much nicer - note that we overwrote the earlier "fancyplot"
 
 fancyplot<-ggplot(gc_clean, aes(x=max_temp, y=cp_GC_coding, color=habitat, shape=habitat)) + 
   geom_point(size=5) + geom_smooth(method=lm, aes(fill=habitat))
@@ -43,7 +45,10 @@ fancyplot
 
 WJTtree <- "data/cp_nt_concatenated.con.tre"
 WJT<-read.nexus(WJTtree)
-#node number subtending OCC group happens to be 103
+#node number subtending OCC group happens to be 103 - this is not particularly easy to figure out
+#I am rerooting the tree to have OCC as outgroup
+# the current WJT can be viewed at anytime by simply running the line 
+# plot(WJT)
 
 #nodelabels(text=1:WJT$Nnode,node=1:WJT$Nnode+Ntip(WJT))
 #getDescendants(WJT,103,curr=NULL)
@@ -51,7 +56,7 @@ WJT<-read.nexus(WJTtree)
 WJT<-reroot(WJT,103)
 plot(WJT)
 
-#ancestral states
+# mapping traits and inferring ancestral states
 gc_data <- read.csv(file=data.name,header=TRUE, row.names=1)
 # pick the column to map and store in a new object
 gc_ssu_tomap <- subset(gc_data,select=SSU_GC)
@@ -64,15 +69,15 @@ gc_cpcoding_tomap <- subset(gc_data,select=cp_GC_coding)
 gc_ssu<-as.matrix(gc_ssu_tomap)[,1]
 gc_cp<-as.matrix(gc_cp_tomap)[,1]
 gc_cpcoding<-as.matrix(gc_cpcoding_tomap)[,1]
-##gc_cpcoding
 
 #estimate ancestral states, substitute objects from above
 fit_ssu<-fastAnc(WJT,gc_ssu,vars=TRUE,CI=TRUE)
 # anc.ML is the other method to infer ancestral states
 # columns with missing data have to be handled separately
-#fit_cp<-fastAnc(WJT,gc_cp,vars=TRUE,CI=TRUE)
+fit_cp<-fastAnc(WJT,gc_cp,vars=TRUE,CI=TRUE)
 fit_cpcoding<-fastAnc(WJT,gc_cpcoding,vars=TRUE,CI=TRUE)
 fit_cpcoding
+# here we are mapping the GC content in chloroplast coding regions (fit_cpcoding) and overall chloroplast GC (fit_cp)
 
 #pick variable to map, draw the tree
 map <- contMap(WJT,gc_cpcoding,plot=FALSE)
@@ -100,6 +105,19 @@ map$tree<-ladderize.simmap(map$tree)
 
 plot(setMap(map,invert=TRUE),fsize=c(0.7,0.7))
 
+#picking ribosomal GC to map, draw the tree
+map <- contMap(WJT,gc_ssu,plot=FALSE)
+plot(map,legend=0.5*max(nodeHeights(WJT)),fsize=c(0.7,0.7))
+
+# recolorize using the invert function above
+plot(setMap(map,invert=TRUE))
+## more making pretty tree - ladderize
+map$tree<-ladderize.simmap(map$tree)
+
+plot(setMap(map,invert=TRUE),fsize=c(0.7,0.7))
+# in this case, one taxon should stand out as extremely high in ribosomal GC content
+
+##########################
 
 ## a couple of ways to correct for the effect of phylogeny in the temp-GC regression
 ## PIC is one
@@ -145,8 +163,8 @@ nodelabels(round(pic.temp,3), adj = c(0,-1), frame="n")
 nodelabels(round(pic.gc,3), adj = c(0,+1), frame="n")
 
 ### trying the same thing for cp GC coding
-gc_data <- read.csv(file="GC_content.csv",header=TRUE, row.names=1)
-WJTtree <- "cp_nt_concatenated.con.tre"
+gc_data <- read.csv(file="data/GC_content.csv",header=TRUE, row.names=1)
+WJTtree <- "data/cp_nt_concatenated.con.tre"
 WJT<-read.nexus(WJTtree)
 WJT<-reroot(WJT,103)
 
