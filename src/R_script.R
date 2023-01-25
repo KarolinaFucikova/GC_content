@@ -143,15 +143,34 @@ data_clean <- gc_data[-miss,]
 pic.temp<-pic(data_clean$max_temp,WJT_clean)
 pic.gc<-pic(data_clean$SSU_GC,WJT_clean)
 
-fit.pic<-lm(pic.gc~pic.temp+0)
+fit.pic<-lm(pic.gc~pic.temp -1)
+# the -1 1 specifies that the regression is through the origin 
+# (the intercept is set to zero) as recommended by Garland et al., 1992.
+# https://www.r-phylo.org/wiki/HowTo/Phylogenetic_Independent_Contrasts
 fit.pic
 
 
 summary(fit.pic)
-plot(pic.temp,pic.gc,xlab="PICs for average temperature in warmest month",
-     ylab="PICs for 18S GC content",bg="grey",
-     cex=1.4,pch=21)
-abline(fit.pic,lwd=2,lty="dashed",col="red")
+plot(pic.temp, pic.gc,
+     xlab="Temperature PIC",
+     ylab="18S GC Content PIC",bg="grey",
+     cex=1.8,pch=21, cex.lab=1.3, cex.axis=1.2)
+abline(fit.pic,lwd=2,lty="dashed",col="grey")
+
+#plotting with ggplot, make dataframe first
+# work in progress, still throws errors
+#pic.temp.list <- as.list(pic.temp)
+#pic.gc.list <- as.list(pic.gc)
+# combine data frames
+#pic.df <- data.frame(matrix(nrow = 58, ncol = 0)) 
+#pic.df$temp <- pic.temp.list
+#pic.df$gc <- pic.gc.list
+# plot
+#fancyplot <- ggplot(pic.df, aes(x=temp, y=gc)) + 
+#  geom_point(size=5) 
+
+#######
+
 
 ## labeling contrasts in the tree to see which point is which
 x<-data_clean$max_temp
@@ -159,8 +178,9 @@ y<-data_clean$SSU_GC
 names(x)<-row.names(data_clean)
 names(y)<-row.names(data_clean)
 plot(WJT_clean)
-nodelabels(round(pic.temp,3), adj = c(0,-1), frame="n")
-nodelabels(round(pic.gc,3), adj = c(0,+1), frame="n")
+nodelabels(round(pic.temp,1), adj = c(0,0), frame="n")
+nodelabels(round(pic.gc,1), adj = c(0,+0.5), frame="n")
+# WJT/Spermatozopsis contrast is not the outliers; those are Chloromonas and Ankyra/Atractomorpha
 
 ### trying the same thing for cp GC coding
 gc_data <- read.csv(file="data/GC_content.csv",header=TRUE, row.names=1)
