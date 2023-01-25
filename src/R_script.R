@@ -115,8 +115,11 @@ plot(setMap(map,invert=TRUE))
 map$tree<-ladderize.simmap(map$tree)
 
 plot(setMap(map,invert=TRUE),fsize=c(0.7,0.7))
-# in this case, one taxon should stand out as extremely high in ribosomal GC content
+# in this case, WJT stands out as extremely high in ribosomal GC content
 
+# plotting in black and white
+bw.contMap<-setMap(map,c("white","black"))
+plot(bw.contMap, lwd=2, fsize=c(0.6,0.6))
 ##########################
 
 ## a couple of ways to correct for the effect of phylogeny in the temp-GC regression
@@ -156,20 +159,6 @@ plot(pic.temp, pic.gc,
      ylab="18S GC Content PIC",bg="grey",
      cex=1.8,pch=21, cex.lab=1.3, cex.axis=1.2)
 abline(fit.pic,lwd=2,lty="dashed",col="grey")
-
-#plotting with ggplot, make dataframe first
-# work in progress, still throws errors
-#pic.temp.list <- as.list(pic.temp)
-#pic.gc.list <- as.list(pic.gc)
-# combine data frames
-#pic.df <- data.frame(matrix(nrow = 58, ncol = 0)) 
-#pic.df$temp <- pic.temp.list
-#pic.df$gc <- pic.gc.list
-# plot
-#fancyplot <- ggplot(pic.df, aes(x=temp, y=gc)) + 
-#  geom_point(size=5) 
-
-#######
 
 
 ## labeling contrasts in the tree to see which point is which
