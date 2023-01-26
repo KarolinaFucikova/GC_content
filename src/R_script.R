@@ -17,6 +17,9 @@ gc_clean <- gc_data[-c(13,30),]
 # simple scatter plot of gc as a function of average temp in the warmest month
 # and other exploratory plots
 plot(gc_data$max_temp,gc_data$SSU_GC,na.rm=TRUE)
+cor.test(gc_data$max_temp, gc_data$SSU_GC, method=c("pearson"))
+
+
 plot(gc_data$cp_GC_total,gc_data$cp_GC_coding,na.rm=TRUE)
 plot(gc_data$max_temp,gc_data$cp_GC_coding,na.rm=TRUE)
 plot(gc_data$max_temp,gc_data$cp_GC_total,na.rm=TRUE)
